@@ -110,10 +110,10 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 					}
 				} else if AppointmentResponse.Embedded.Appointments[appointMentIterator].State == "PAID" {
 					if branchIDs[branchIterator] == "PrR5u0vgGQFOdrxAnc5zmA" {
-						newTrackEventRequest.Event = "BAUR AU LAC Appointment Amount Paid"
+						newTrackEventRequest.Event = "BAUR AU LAC Appointment Paid"
 					}
 					if branchIDs[branchIterator] == "M8rNUoJoj-xZAgAopEiv0w" {
-						newTrackEventRequest.Event = "Bleicherweg Appointment Amount Paid"
+						newTrackEventRequest.Event = "Bleicherweg Appointment Paid"
 					}
 					services := GetProductDetails(newTrackEventRequest.CustomerProperties.ClientID, AppointmentResponse.Embedded.Appointments[appointMentIterator].AppointmentID, AppointmentResponse.Embedded.Appointments[appointMentIterator].AppointmentDate)
 					if services == (klaviyo.Services{}) {
