@@ -35,7 +35,10 @@ type NewProductEventRequest struct {
 		Gender    string `json:"$gender"`
 	} `json:"customer_properties"`
 	Properties struct {
-		Product Services `json:"product"`
+		Product                Services `json:"product"`
+		CategoryName           string   `json:"CategoryName"`
+		TreatmentName          string   `json:"TreatmentName"`
+		TreatmentOriginalPrice float64  `json:"TreatmentOriginalPrice"`
 	} `json:"properties"`
 	Time int `json:"time"`
 }

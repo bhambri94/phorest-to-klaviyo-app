@@ -46,6 +46,8 @@ func GetBranches() []string {
 func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 	branchIterator := 0
 	for branchIterator < len(branchIDs) {
+		ServiceNameMap, ServiceCategoryIDMap, ServicePriceMap := GetServiceMap(branchIDs[branchIterator])
+		CategoryNameMap := GetServiceCategoryMap(branchIDs[branchIterator])
 		TotalPages := 1
 		pageIterator := 0
 		for pageIterator < TotalPages {
@@ -135,6 +137,10 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 					newProductEventRequest.CustomerProperties.Phone = clientDetailsMap["Mobile"]
 					newProductEventRequest.CustomerProperties.Gender = clientDetailsMap["Gender"]
 					newProductEventRequest.Properties.Product = services
+					newProductEventRequest.Properties.TreatmentName = ServiceNameMap[services.ServiceID]
+					newProductEventRequest.Properties.TreatmentOriginalPrice = ServicePriceMap[services.ServiceID]
+					newProductEventRequest.Properties.CategoryName = CategoryNameMap[ServiceCategoryIDMap[services.ServiceID]]
+
 					klaviyoProductRequestBody, err := json.Marshal(newProductEventRequest)
 					if err != nil {
 						fmt.Println(err)
@@ -222,4 +228,72 @@ func GetProductDetails(ClientID string, AppointmentID string, Date string) klavi
 		}
 	}
 	return services
+}
+
+func GetServiceMap(BranchId string) (map[string]string, map[string]string, map[string]float64) {
+	ServiceNameMap := make(map[string]string)
+	ServiceCategoryIdMap := make(map[string]string)
+	ServicePriceMap := make(map[string]float64)
+	TotalPages := 1
+	pageIterator := 0
+	for pageIterator < TotalPages {
+		url := "https://api-gateway-eu.phorest.com/third-party-api-server/api/business/" + configs.Configurations.PhorestBuisnessID + "/branch/" + BranchId + "/service?page=" + strconv.Itoa(pageIterator) + "&size=20"
+		method := "GET"
+
+		client := &http.Client{}
+		req, err := http.NewRequest(method, url, nil)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+		req.Header.Add("Authorization", configs.Configurations.PhorestBasicAuth)
+
+		res, err := client.Do(req)
+		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+		var getServiceResponse GetServicesResponse
+		json.Unmarshal(body, &getServiceResponse)
+		TotalPages = getServiceResponse.Page.TotalPages
+		serviceIterator := 0
+		for serviceIterator < getServiceResponse.Page.Size {
+			ServiceNameMap[getServiceResponse.Embedded.Services[serviceIterator].ServiceID] = getServiceResponse.Embedded.Services[serviceIterator].Name
+			ServiceCategoryIdMap[getServiceResponse.Embedded.Services[serviceIterator].ServiceID] = getServiceResponse.Embedded.Services[serviceIterator].CategoryID
+			ServicePriceMap[getServiceResponse.Embedded.Services[serviceIterator].ServiceID] = getServiceResponse.Embedded.Services[serviceIterator].Price
+			serviceIterator++
+		}
+		pageIterator++
+	}
+	return ServiceNameMap, ServiceCategoryIdMap, ServicePriceMap
+}
+
+func GetServiceCategoryMap(BranchId string) map[string]string {
+	ServiceCategoryMap := make(map[string]string)
+	TotalPages := 1
+	pageIterator := 0
+	for pageIterator < TotalPages {
+		url := "https://api-gateway-eu.phorest.com/third-party-api-server/api/business/" + configs.Configurations.PhorestBuisnessID + "/branch/" + BranchId + "/service-category?page=" + strconv.Itoa(pageIterator) + "&size=20"
+		method := "GET"
+
+		client := &http.Client{}
+		req, err := http.NewRequest(method, url, nil)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+		req.Header.Add("Authorization", configs.Configurations.PhorestBasicAuth)
+		res, err := client.Do(req)
+		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+		var getCategoryResponse GetCategoryResponse
+		json.Unmarshal(body, &getCategoryResponse)
+		fmt.Println(getCategoryResponse)
+		TotalPages = getCategoryResponse.Page.TotalPages
+		categoryIterator := 0
+		for categoryIterator < getCategoryResponse.Page.Size {
+			ServiceCategoryMap[getCategoryResponse.Embedded.ServiceCategories[categoryIterator].CategoryID] = getCategoryResponse.Embedded.ServiceCategories[categoryIterator].Name
+			categoryIterator++
+		}
+		pageIterator++
+	}
+	return ServiceCategoryMap
 }

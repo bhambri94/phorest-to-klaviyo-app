@@ -120,3 +120,36 @@ type GetClientServiceHistoryResponse struct {
 		Number        int `json:"number"`
 	} `json:"page"`
 }
+
+type GetServicesResponse struct {
+	Embedded struct {
+		Services []struct {
+			ServiceID  string  `json:"serviceId"`
+			CategoryID string  `json:"categoryId"`
+			Name       string  `json:"name"`
+			Price      float64 `json:"price"`
+		} `json:"services"`
+	} `json:"_embedded"`
+	Page struct {
+		Size          int `json:"size"`
+		TotalElements int `json:"totalElements"`
+		TotalPages    int `json:"totalPages"`
+		Number        int `json:"number"`
+	} `json:"page"`
+}
+
+type GetCategoryResponse struct {
+	Embedded struct {
+		ServiceCategories []struct {
+			CategoryID  string `json:"categoryId"`
+			Name        string `json:"name"`
+			Description string `json:"description,omitempty"`
+		} `json:"serviceCategories"`
+	} `json:"_embedded"`
+	Page struct {
+		Size          int `json:"size"`
+		TotalElements int `json:"totalElements"`
+		TotalPages    int `json:"totalPages"`
+		Number        int `json:"number"`
+	} `json:"page"`
+}
