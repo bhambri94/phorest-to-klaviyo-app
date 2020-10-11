@@ -14,11 +14,14 @@ type NewAppointmentEventRequest struct {
 		Gender    string `json:"$gender"`
 	} `json:"customer_properties"`
 	Properties struct {
-		AppointmentDate string  `json:"appointmentDate"`
-		StartTime       string  `json:"startTime"`
-		EndTime         string  `json:"endTime"`
-		State           string  `json:"state"`
-		Price           float64 `json:"price"`
+		AppointmentDate        string  `json:"appointmentDate"`
+		StartTime              string  `json:"startTime"`
+		EndTime                string  `json:"endTime"`
+		State                  string  `json:"state"`
+		Price                  float64 `json:"price"`
+		CategoryName           string  `json:"CategoryName"`
+		TreatmentName          string  `json:"TreatmentName"`
+		TreatmentOriginalPrice float64 `json:"TreatmentOriginalPrice"`
 	} `json:"properties"`
 	Time int `json:"time"`
 }

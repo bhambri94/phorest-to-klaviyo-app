@@ -88,6 +88,9 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 				newTrackEventRequest.Properties.EndTime = AppointmentResponse.Embedded.Appointments[appointMentIterator].EndTime
 				newTrackEventRequest.Properties.State = AppointmentResponse.Embedded.Appointments[appointMentIterator].State
 				newTrackEventRequest.Properties.Price = AppointmentResponse.Embedded.Appointments[appointMentIterator].Price
+				newTrackEventRequest.Properties.TreatmentName = ServiceNameMap[AppointmentResponse.Embedded.Appointments[appointMentIterator].ServiceID]
+				newTrackEventRequest.Properties.TreatmentOriginalPrice = ServicePriceMap[AppointmentResponse.Embedded.Appointments[appointMentIterator].ServiceID]
+				newTrackEventRequest.Properties.CategoryName = CategoryNameMap[ServiceCategoryIDMap[AppointmentResponse.Embedded.Appointments[appointMentIterator].ServiceID]]
 				newTrackEventRequest.Time = int(time.Now().Unix())
 				if AppointmentResponse.Embedded.Appointments[appointMentIterator].State == "BOOKED" && AppointmentResponse.Embedded.Appointments[appointMentIterator].ActivationState == "ACTIVE" {
 					if branchIDs[branchIterator] == "PrR5u0vgGQFOdrxAnc5zmA" {
@@ -145,6 +148,9 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 					if err != nil {
 						fmt.Println(err)
 					}
+					fmt.Println("#############")
+					fmt.Println(string(klaviyoProductRequestBody))
+					fmt.Println("#############")
 					klaviyoProductRequestBodyBytes := base64.StdEncoding.EncodeToString(klaviyoProductRequestBody) + "=="
 					klaviyo.TrackEventOnKlaviyo(klaviyoProductRequestBodyBytes)
 				}
