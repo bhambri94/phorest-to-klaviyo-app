@@ -17,7 +17,7 @@ func main() {
 	fromDateTime = currentTime.Add(time.Duration(-HoursCount) * time.Hour).Format("2006-01-02")
 	toDateTime = currentTime.Format("2006-01-02")
 	fmt.Println("Fetching results from Date: "+fromDateTime, " to "+toDateTime)
-
 	BranchList := phorest.GetBranches()
 	phorest.TrackAppointmentDetails(BranchList, fromDateTime, toDateTime)
+	phorest.TrackCoursesAbosDetails(BranchList, fromDateTime)
 }

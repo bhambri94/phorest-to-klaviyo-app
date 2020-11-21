@@ -153,3 +153,58 @@ type GetCategoryResponse struct {
 		Number        int `json:"number"`
 	} `json:"page"`
 }
+
+type GetAllCourseByBranchResponse struct {
+	Embedded struct {
+		Courses []struct {
+			CourseID          string  `json:"courseId"`
+			CourseName        string  `json:"courseName"`
+			AvailableOnline   bool    `json:"availableOnline"`
+			MultiBranchCourse bool    `json:"multiBranchCourse"`
+			TotalPrice        float64 `json:"totalPrice"`
+			CourseItems       []struct {
+				CourseItemID string  `json:"courseItemId"`
+				UnitType     string  `json:"unitType"`
+				TotalUnits   int     `json:"totalUnits"`
+				TotalPrice   float64 `json:"totalPrice"`
+				ServiceID    string  `json:"serviceId"`
+			} `json:"courseItems"`
+		} `json:"courses"`
+	} `json:"_embedded"`
+	Page struct {
+		Size          int `json:"size"`
+		TotalElements int `json:"totalElements"`
+		TotalPages    int `json:"totalPages"`
+		Number        int `json:"number"`
+	} `json:"page"`
+}
+
+type GetCoursesResponse struct {
+	Embedded struct {
+		ClientCourses []struct {
+			ClientCourseID     string  `json:"clientCourseId"`
+			ClientID           string  `json:"clientId"`
+			PurchasingBranchID string  `json:"purchasingBranchId"`
+			CourseID           string  `json:"courseId"`
+			PurchaseDate       string  `json:"purchaseDate"`
+			ExpiryDate         string  `json:"expiryDate"`
+			GrossPrice         float64 `json:"grossPrice"`
+			NetPrice           float64 `json:"netPrice"`
+			ClientCourseItems  []struct {
+				ClientCourseItemID string  `json:"clientCourseItemId"`
+				CourseItemID       string  `json:"courseItemId"`
+				ServiceID          string  `json:"serviceId"`
+				InitialUnits       int     `json:"initialUnits"`
+				RemainingUnits     int     `json:"remainingUnits"`
+				GrossPrice         float64 `json:"grossPrice"`
+				NetPrice           float64 `json:"netPrice"`
+			} `json:"clientCourseItems"`
+		} `json:"clientCourses"`
+	} `json:"_embedded"`
+	Page struct {
+		Size          int `json:"size"`
+		TotalElements int `json:"totalElements"`
+		TotalPages    int `json:"totalPages"`
+		Number        int `json:"number"`
+	} `json:"page"`
+}

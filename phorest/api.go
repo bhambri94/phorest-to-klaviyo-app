@@ -203,6 +203,126 @@ func TrackAppointmentDetails(branchIDs []string, fromDate string, toDate string)
 	GetAppoinments(branchIDs, fromDate, toDate)
 }
 
+func TrackCoursesAbosDetails(branchIDs []string, fromDate string) {
+	GetCourses(branchIDs, fromDate)
+}
+
+func GetCourseMap(branchID string) (map[string]string, map[string]float64, map[string]int) {
+	CourseNameMap := make(map[string]string)
+	CoursePriceMap := make(map[string]float64)
+	CourseUnitsMap := make(map[string]int)
+	TotalPages := 1
+	pageIterator := 0
+	for pageIterator < TotalPages {
+		url := "https://api-gateway-eu.phorest.com/third-party-api-server/api/business/" + configs.Configurations.PhorestBuisnessID + "/branch/" + branchID + "/course?page=" + strconv.Itoa(pageIterator) + "&size=20"
+		method := "GET"
+
+		client := &http.Client{}
+		req, err := http.NewRequest(method, url, nil)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+		req.Header.Add("Authorization", configs.Configurations.PhorestBasicAuth)
+
+		res, err := client.Do(req)
+		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+
+		var getAllCourseByBranchResponse GetAllCourseByBranchResponse
+		json.Unmarshal(body, &getAllCourseByBranchResponse)
+		TotalPages = getAllCourseByBranchResponse.Page.TotalPages
+		clientCoursesIterator := 0
+		for clientCoursesIterator < getAllCourseByBranchResponse.Page.Size {
+			CourseNameMap[getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseItems[0].CourseItemID] = getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseName
+			CoursePriceMap[getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseItems[0].CourseItemID] = getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseItems[0].TotalPrice
+			CourseUnitsMap[getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseItems[0].CourseItemID] = getAllCourseByBranchResponse.Embedded.Courses[clientCoursesIterator].CourseItems[0].TotalUnits
+			clientCoursesIterator++
+		}
+		pageIterator++
+	}
+	return CourseNameMap, CoursePriceMap, CourseUnitsMap
+}
+
+func GetCourses(branchIDs []string, purchaseDate string) {
+	branchIterator := 0
+	for branchIterator < len(branchIDs) {
+		CourseNameMap, CoursePriceMap, CourseUnitsMap := GetCourseMap(branchIDs[branchIterator])
+		TotalPages := 1
+		pageIterator := 0
+		BreakAllLoops := false
+		for pageIterator < TotalPages {
+			if BreakAllLoops {
+				break
+			}
+			url := "https://api-gateway-eu.phorest.com/third-party-api-server/api/business/" + configs.Configurations.PhorestBuisnessID + "/clientcourse?page=" + strconv.Itoa(pageIterator) + "&size=20"
+			method := "GET"
+
+			client := &http.Client{}
+			req, err := http.NewRequest(method, url, nil)
+
+			if err != nil {
+				fmt.Println(err)
+			}
+			req.Header.Add("Authorization", configs.Configurations.PhorestBasicAuth)
+
+			res, err := client.Do(req)
+			defer res.Body.Close()
+			body, err := ioutil.ReadAll(res.Body)
+			var getCoursesResponse GetCoursesResponse
+			json.Unmarshal(body, &getCoursesResponse)
+			TotalPages = getCoursesResponse.Page.TotalPages
+			clientCoursesIterator := 0
+			for clientCoursesIterator < getCoursesResponse.Page.Size {
+				if purchaseDate != getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].PurchaseDate {
+					BreakAllLoops = true
+					clientCoursesIterator++
+					break
+				}
+				if branchIDs[branchIterator] != getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].PurchasingBranchID {
+					clientCoursesIterator++
+					continue
+				}
+				var NewAboPurchaseEventRequest klaviyo.NewAboPurchaseEventRequest
+				if branchIDs[branchIterator] == "PrR5u0vgGQFOdrxAnc5zmA" {
+					NewAboPurchaseEventRequest.Event = "BAUR AU LAC Abo Purchase"
+				}
+				if branchIDs[branchIterator] == "M8rNUoJoj-xZAgAopEiv0w" {
+					NewAboPurchaseEventRequest.Event = "Bleicherweg Abo Purchase"
+				}
+				clientDetailsMap := getClientDetails(getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientID)
+				NewAboPurchaseEventRequest.Token = configs.Configurations.KlaviyoPublicKey
+				NewAboPurchaseEventRequest.CustomerProperties.Email = clientDetailsMap["Email"]
+				NewAboPurchaseEventRequest.CustomerProperties.ClientID = clientDetailsMap["ClientID"]
+				NewAboPurchaseEventRequest.CustomerProperties.FirstName = clientDetailsMap["FirstName"]
+				NewAboPurchaseEventRequest.CustomerProperties.LastName = clientDetailsMap["LastName"]
+				NewAboPurchaseEventRequest.CustomerProperties.Phone = clientDetailsMap["Mobile"]
+				NewAboPurchaseEventRequest.CustomerProperties.Gender = clientDetailsMap["Gender"]
+				NewAboPurchaseEventRequest.Properties.CourseName = CourseNameMap[getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientCourseItems[0].CourseItemID]
+				NewAboPurchaseEventRequest.Properties.CourseTotalPrice = CoursePriceMap[getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientCourseItems[0].CourseItemID]
+				NewAboPurchaseEventRequest.Properties.CourseTotalUnits = CourseUnitsMap[getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientCourseItems[0].CourseItemID]
+				NewAboPurchaseEventRequest.Properties.GrossPrice = getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].GrossPrice
+				NewAboPurchaseEventRequest.Properties.NetPrice = getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].NetPrice
+				NewAboPurchaseEventRequest.Properties.PurchaseDate = getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].PurchaseDate
+
+				klaviyoProductRequestBody, err := json.Marshal(NewAboPurchaseEventRequest)
+				if err != nil {
+					fmt.Println(err)
+				}
+				fmt.Println("#############")
+				fmt.Println(string(klaviyoProductRequestBody))
+				fmt.Println("#############")
+				klaviyoProductRequestBodyBytes := base64.StdEncoding.EncodeToString(klaviyoProductRequestBody) + "=="
+				klaviyo.TrackEventOnKlaviyo(klaviyoProductRequestBodyBytes)
+				clientCoursesIterator++
+			}
+			pageIterator++
+		}
+		branchIterator++
+	}
+
+}
+
 func GetProductDetails(ClientID string, AppointmentID string, Date string) klaviyo.Services {
 	url := "https://api-gateway-eu.phorest.com/third-party-api-server/api/business/" + configs.Configurations.PhorestBuisnessID + "/client/" + ClientID + "/service-history?page=0&size=3"
 	method := "GET"
@@ -218,7 +338,6 @@ func GetProductDetails(ClientID string, AppointmentID string, Date string) klavi
 	res, err := client.Do(req)
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
-	fmt.Println(string(body))
 	var serviceHistory GetClientServiceHistoryResponse
 	var services klaviyo.Services
 	json.Unmarshal(body, &serviceHistory)

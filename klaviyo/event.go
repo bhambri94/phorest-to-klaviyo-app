@@ -26,6 +26,28 @@ type NewAppointmentEventRequest struct {
 	Time int `json:"time"`
 }
 
+type NewAboPurchaseEventRequest struct {
+	Token              string `json:"token"`
+	Event              string `json:"event"`
+	CustomerProperties struct {
+		Email     string `json:"$email"`
+		Phone     string `json:"$phone"`
+		FirstName string `json:"$firstName"`
+		LastName  string `json:"$lastName"`
+		ClientID  string `json:"$clientID"`
+		Gender    string `json:"$gender"`
+	} `json:"customer_properties"`
+	Properties struct {
+		CourseName       string  `json:"courseName"`
+		CourseTotalPrice float64 `json:"courseTotalPrice"`
+		CourseTotalUnits int     `json:"courseTotalUnits"`
+		PurchaseDate     string  `json:"purchaseDate"`
+		NetPrice         float64 `json:"netPrice"`
+		GrossPrice       float64 `json:"grossPrice"`
+	} `json:"properties"`
+	Time int `json:"time"`
+}
+
 type NewProductEventRequest struct {
 	Token              string `json:"token"`
 	Event              string `json:"event"`
