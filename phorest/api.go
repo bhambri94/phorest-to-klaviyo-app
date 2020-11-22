@@ -79,9 +79,9 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 				newTrackEventRequest.Token = configs.Configurations.KlaviyoPublicKey
 				newTrackEventRequest.CustomerProperties.Email = clientDetailsMap["Email"]
 				newTrackEventRequest.CustomerProperties.ClientID = clientDetailsMap["ClientID"]
-				newTrackEventRequest.CustomerProperties.FirstName = clientDetailsMap["FirstName"]
-				newTrackEventRequest.CustomerProperties.LastName = clientDetailsMap["LastName"]
-				newTrackEventRequest.CustomerProperties.Phone = clientDetailsMap["Mobile"]
+				newTrackEventRequest.CustomerProperties.First_name = clientDetailsMap["FirstName"]
+				newTrackEventRequest.CustomerProperties.Last_name = clientDetailsMap["LastName"]
+				newTrackEventRequest.CustomerProperties.Phone_number = clientDetailsMap["Mobile"]
 				newTrackEventRequest.CustomerProperties.Gender = clientDetailsMap["Gender"]
 				newTrackEventRequest.Properties.AppointmentDate = AppointmentResponse.Embedded.Appointments[appointMentIterator].AppointmentDate
 				newTrackEventRequest.Properties.StartTime = AppointmentResponse.Embedded.Appointments[appointMentIterator].StartTime
@@ -135,9 +135,9 @@ func GetAppoinments(branchIDs []string, fromDate string, toDate string) {
 					newProductEventRequest.Token = configs.Configurations.KlaviyoPublicKey
 					newProductEventRequest.CustomerProperties.Email = clientDetailsMap["Email"]
 					newProductEventRequest.CustomerProperties.ClientID = clientDetailsMap["ClientID"]
-					newProductEventRequest.CustomerProperties.FirstName = clientDetailsMap["FirstName"]
-					newProductEventRequest.CustomerProperties.LastName = clientDetailsMap["LastName"]
-					newProductEventRequest.CustomerProperties.Phone = clientDetailsMap["Mobile"]
+					newProductEventRequest.CustomerProperties.First_name = clientDetailsMap["FirstName"]
+					newProductEventRequest.CustomerProperties.Last_name = clientDetailsMap["LastName"]
+					newProductEventRequest.CustomerProperties.Phone_number = clientDetailsMap["Mobile"]
 					newProductEventRequest.CustomerProperties.Gender = clientDetailsMap["Gender"]
 					newProductEventRequest.Properties.Product = services
 					newProductEventRequest.Properties.TreatmentName = ServiceNameMap[services.ServiceID]
@@ -274,6 +274,7 @@ func GetCourses(branchIDs []string, purchaseDate string) {
 			TotalPages = getCoursesResponse.Page.TotalPages
 			clientCoursesIterator := 0
 			for clientCoursesIterator < getCoursesResponse.Page.Size {
+				fmt.Println("Inside Course iterating")
 				if purchaseDate != getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].PurchaseDate {
 					BreakAllLoops = true
 					clientCoursesIterator++
@@ -294,9 +295,9 @@ func GetCourses(branchIDs []string, purchaseDate string) {
 				NewAboPurchaseEventRequest.Token = configs.Configurations.KlaviyoPublicKey
 				NewAboPurchaseEventRequest.CustomerProperties.Email = clientDetailsMap["Email"]
 				NewAboPurchaseEventRequest.CustomerProperties.ClientID = clientDetailsMap["ClientID"]
-				NewAboPurchaseEventRequest.CustomerProperties.FirstName = clientDetailsMap["FirstName"]
-				NewAboPurchaseEventRequest.CustomerProperties.LastName = clientDetailsMap["LastName"]
-				NewAboPurchaseEventRequest.CustomerProperties.Phone = clientDetailsMap["Mobile"]
+				NewAboPurchaseEventRequest.CustomerProperties.First_name = clientDetailsMap["FirstName"]
+				NewAboPurchaseEventRequest.CustomerProperties.Last_name = clientDetailsMap["LastName"]
+				NewAboPurchaseEventRequest.CustomerProperties.Phone_number = clientDetailsMap["Mobile"]
 				NewAboPurchaseEventRequest.CustomerProperties.Gender = clientDetailsMap["Gender"]
 				NewAboPurchaseEventRequest.Properties.CourseName = CourseNameMap[getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientCourseItems[0].CourseItemID]
 				NewAboPurchaseEventRequest.Properties.CourseTotalPrice = CoursePriceMap[getCoursesResponse.Embedded.ClientCourses[clientCoursesIterator].ClientCourseItems[0].CourseItemID]

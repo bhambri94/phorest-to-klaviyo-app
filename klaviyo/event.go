@@ -6,12 +6,12 @@ type NewAppointmentEventRequest struct {
 	Token              string `json:"token"`
 	Event              string `json:"event"`
 	CustomerProperties struct {
-		Email     string `json:"$email"`
-		Phone     string `json:"$phone"`
-		FirstName string `json:"$firstName"`
-		LastName  string `json:"$lastName"`
-		ClientID  string `json:"$clientID"`
-		Gender    string `json:"$gender"`
+		Email        string `json:"$email"`
+		Phone_number string `json:"$phone_number"`
+		First_name   string `json:"$first_name"`
+		Last_name    string `json:"$last_name"`
+		ClientID     string `json:"$clientID"`
+		Gender       string `json:"$gender"`
 	} `json:"customer_properties"`
 	Properties struct {
 		AppointmentDate        string  `json:"appointmentDate"`
@@ -30,12 +30,12 @@ type NewAboPurchaseEventRequest struct {
 	Token              string `json:"token"`
 	Event              string `json:"event"`
 	CustomerProperties struct {
-		Email     string `json:"$email"`
-		Phone     string `json:"$phone"`
-		FirstName string `json:"$firstName"`
-		LastName  string `json:"$lastName"`
-		ClientID  string `json:"$clientID"`
-		Gender    string `json:"$gender"`
+		Email        string `json:"$email"`
+		Phone_number string `json:"$phone_number"`
+		First_name   string `json:"$first_name"`
+		Last_name    string `json:"$last_name"`
+		ClientID     string `json:"$clientID"`
+		Gender       string `json:"$gender"`
 	} `json:"customer_properties"`
 	Properties struct {
 		CourseName       string  `json:"courseName"`
@@ -52,12 +52,12 @@ type NewProductEventRequest struct {
 	Token              string `json:"token"`
 	Event              string `json:"event"`
 	CustomerProperties struct {
-		Email     string `json:"$email"`
-		Phone     string `json:"$phone"`
-		FirstName string `json:"$firstName"`
-		LastName  string `json:"$lastName"`
-		ClientID  string `json:"$clientID"`
-		Gender    string `json:"$gender"`
+		Email        string `json:"$email"`
+		Phone_number string `json:"$phone_number"`
+		First_name   string `json:"$first_name"`
+		Last_name    string `json:"$last_name"`
+		ClientID     string `json:"$clientID"`
+		Gender       string `json:"$gender"`
 	} `json:"customer_properties"`
 	Properties struct {
 		Product                Services `json:"product"`
